@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bht.fpa.mail.s769164.controller.MailController">
+   <children>
+      <MenuBar fx:id="menu">
+        <menus>
+          <Menu mnemonicParsing="false" text="Account" />
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Open" />
+                  <MenuItem mnemonicParsing="false" text="Save" />
+            </items>
+          </Menu>
+        </menus>
+         <VBox.margin>
+            <Insets left="10.0" right="10.0" top="10.0" />
+         </VBox.margin>
+      </MenuBar>
+      <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
+        <items>
+            <TreeView fx:id="tree" prefHeight="200.0" prefWidth="200.0" />
+            <SplitPane dividerPositions="0.5" orientation="VERTICAL">
+              <items>
+                  <VBox>
+                     <children>
+                        <HBox prefHeight="100.0">
+                           <children>
+                              <Label contentDisplay="CENTER" text="Search: ">
+                                 <padding>
+                                    <Insets top="2.5" />
+                                 </padding>
+                              </Label>
+                              <TextField fx:id="search" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" />
+                                 </HBox.margin>
+                              </TextField>
+                              <Label fx:id="counter" text="( )">
+                                 <padding>
+                                    <Insets top="2.5" />
+                                 </padding>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <TableView fx:id="table" prefWidth="200.0">
+                          <columns>
+                              <TableColumn prefWidth="75.0" text="Importance" />
+                              <TableColumn fx:id="receivedColumn" prefWidth="75.0" text="Received" />
+                              <TableColumn prefWidth="75.0" text="Read" />
+                              <TableColumn prefWidth="75.0" text="Sender" />
+                              <TableColumn prefWidth="75.0" text="Recipients" />
+                              <TableColumn prefWidth="75.0" text="Subject" />
+                          </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <VBox prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Label text="Sender:" />
+                                    <Label text="Subject:" />
+                                    <Label text="Received:" />
+                                    <Label text="Receiver:" />
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="200.0">
+                                 <children>
+                                    <Label fx:id="senderID" />
+                                    <Label fx:id="subjectID" />
+                                    <Label fx:id="receivedID" />
+                                    <Label fx:id="receiverID" />
+                                 </children>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </HBox>
+                        <TextArea fx:id="textAreaID" prefHeight="200.0" prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </TextArea>
+                     </children>
+                  </VBox>
+              </items>
+            </SplitPane>
+        </items>
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" />
+         </VBox.margin>
+      </SplitPane>
+   </children>
+</VBox>

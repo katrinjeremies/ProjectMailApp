@@ -1,11 +1,13 @@
 package de.bht.fpa.mail.s769164.controller;
 
+import de.bht.fpa.mail.s769164.model.applicationData.Account;
 import de.bht.fpa.mail.s769164.model.applicationData.Component;
 import de.bht.fpa.mail.s769164.model.applicationData.Email;
 import de.bht.fpa.mail.s769164.model.applicationData.Folder;
 import de.bht.fpa.mail.s769164.model.applicationLogic.ApplicationLogicIF;
 import de.bht.fpa.mail.s769164.model.applicationLogic.Fassade;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -24,8 +26,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -41,6 +46,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
 /**
  * @author Katrin Jeremies
@@ -81,11 +87,16 @@ public class MailController implements Initializable {
     @FXML
     private TextField search;
     
+    @FXML
+    private Menu openAccount;
+    
     private ApplicationLogicIF appliLog;
     
     private boolean checkListener;
     
     private final ObservableList<Email> tableContent;
+    
+    private EventHandler menuHandler;
     
     
     public MailController(){
@@ -114,24 +125,48 @@ public class MailController implements Initializable {
      * eventhandling of menue
      */
     public void configureMenue(){    
-        EventHandler handler = (EventHandler<ActionEvent>) (ActionEvent event) -> {
-            MenuItem menuItem =(MenuItem) event.getSource();
-            String context = menuItem.getText();
-            DirectoryChooser chooser = new DirectoryChooser();
-            File directory = chooser.showDialog(null);
-            if(context.equals("Open")){
-                if(directory != null){
-                    appliLog.changeDirectory(directory);
-                    createTree();
+        menuHandler = (EventHandler<ActionEvent>) event -> menuEventHandler(event);
+        List menuChilds = openAccount.getItems();
+        for(String name : appliLog.getAllAccounts()){
+            MenuItem item = new MenuItem(name);
+            menuChilds.add(item);
+        }
+        for(Menu m: menu.getMenus()){
+            for(MenuItem i: m.getItems()){
+                if(i instanceof Menu){
+                    for(MenuItem child: ((Menu)i).getItems()){
+                        child.setOnAction(menuHandler);
+                    }
+                }else{
+                    i.setOnAction(menuHandler);
                 }
-            }else if(context.equals("Save")){
-                appliLog.saveEmails(directory);
             }
-        };
-        for(Menu m:menu.getMenus()){
-            for(MenuItem i:m.getItems()){
-                i.setOnAction(handler);
+        }
+    }
+    
+    public void menuEventHandler(ActionEvent event){
+        MenuItem menuItem = (MenuItem) event.getSource();
+        String context = menuItem.getText();
+        DirectoryChooser chooser = new DirectoryChooser();
+        if(context.equals("Open")){
+            File directory = chooser.showDialog(null);
+            if(directory != null){
+                appliLog.changeDirectory (directory);
+                createTree();
             }
+        }
+        if(context.equals("Save")){
+            File directory = chooser.showDialog(null);
+            appliLog.saveEmails(directory);
+        }
+        if(context.equals("New Account")){
+            createAccountWindow();
+        }
+        Menu parent = menuItem.getParentMenu();
+        String menuName = parent.getText();
+        if(menuName.equals("Open Account")){
+            appliLog.openAccount(context);
+            createTree();
         }
     }
     
@@ -348,9 +383,7 @@ public class MailController implements Initializable {
      * configure search box and call handleKeyTypedEvent-methode if key was typed
      */
     public void configureSearch(){
-        search.setOnKeyTyped((Event event) -> {
-            handleKeyTypedEvent(event);
-        });
+        search.setOnKeyTyped((Event event) -> handleKeyTypedEvent(event));
     }
     
     /**
@@ -363,5 +396,33 @@ public class MailController implements Initializable {
         List<Email> list = appliLog.search(text);
         tableContent.addAll(list);     //set results to table
         counter.setText("(" + tableContent.size() + ")");     //set result-number next to search box
+    }
+    
+    public void createAccountWindow(){
+        try {
+            Stage stage = new Stage();
+            stage.setTitle("New Account");
+            AccountController controll = new AccountController(this);
+            FXMLLoader loader = new FXMLLoader();
+            loader.setController(controll);
+            String path = "/de/bht/fpa/mail/s769164/view/AccountFXML.fxml";
+            loader.setLocation(getClass().getResource(path));
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
+        }      
+    }
+    
+    public boolean saveAccount(Account account){
+        boolean isSaved = appliLog.saveAccount(account);
+        if(isSaved){
+            String name = account.getName();
+            MenuItem item = new MenuItem(name);
+            item.setOnAction(menuHandler);
+            openAccount.getItems().add(item);
+        }
+        return isSaved;
     }
 }

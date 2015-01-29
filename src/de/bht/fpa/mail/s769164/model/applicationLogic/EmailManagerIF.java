@@ -12,8 +12,8 @@ public interface EmailManagerIF {
     
     void loadEmails(Folder f); 
     
-    void saveEmails(File file);
+    void saveEmails(File file, Folder markedFolder);
     
-    List<Email> search(String pattern);
+    List<Email> search(String pattern, Folder markedFolder);
     
 }
